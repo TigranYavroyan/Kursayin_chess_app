@@ -24,7 +24,6 @@ export function userDisconnect ({session_starts, wss}) {
 		console.log("Server is closed");
 		process.exit(1);
 	}
-	console.log("Someone disconnected...");
 }
 
 export function messaging (message, chessEngine) {

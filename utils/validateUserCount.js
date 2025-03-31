@@ -6,6 +6,5 @@ export function validateUserCount (userCount, ws) {
 			redirectUrl: "/full_server"
 		}));
 		ws.close();
-		return;
 	}
 }

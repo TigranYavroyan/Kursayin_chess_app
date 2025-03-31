@@ -4,7 +4,6 @@ export const moveParse = function(data, message) {
 	try {
 		data = JSON.parse(data.toString("utf-8"));
 		if (data["game_end"] === "true") {
-			game_end = true;
 			send_all_clients_json({
 				"type" : "game_over",
 				"message" : "The game has ended. Thanks for playing!"

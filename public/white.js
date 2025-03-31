@@ -30,13 +30,7 @@ let valid_move = null;
 
 ws.onmessage = event => {
     const data = JSON.parse(event.data);
-    if (data.type === "full_server") {
-        // Handle the error and redirect to the error page
-        console.error("Error from server:", data.message);
-        window.location.href = data.redirectUrl; // Redirect to the error page
-        return;
-    }
-    else if (data.type === "session_end") {
+    if (data.type === "full_server" || data.type === "session_end") {
         console.error("Error from server:", data.message);
         window.location.href = data.redirectUrl; // Redirect to the error page
         return;
@@ -98,6 +92,12 @@ function draw_checkboard () {
     for (const [index, piece] of Object.entries(initialPositions)) {
         const pieceElement = document.createElement('div');
         pieceElement.classList.add('piece');
+        if (index >= 0 && index <= 15) {
+            pieceElement.classList.add('black');
+        }
+        else if (index >= 48) {
+            pieceElement.classList.add('white');
+        }
         pieceElement.textContent = piece;
         const row = Math.floor(index / 8);
         const col = index % 8;
@@ -117,6 +117,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let startSquare = null;
 
     document.querySelectorAll('.piece').forEach(piece => {
+        if (piece.classList.contains('black'))
+            return ;
         piece.addEventListener('mousedown', (e) => {
             selectedPiece = e.target;
             offsetX = e.offsetX;

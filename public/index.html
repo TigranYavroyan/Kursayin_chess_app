@@ -1,13 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chessboard</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Connecting to Chess Game...</title>
+  <script src="config.js"></script>
+  <script>
+    const localIP = window.location.hostname;
+    const PORT = window.config.backendPort;
+    const apiEndpoint = `${localIP}:${PORT}`;
+    
+    let ws;
+    try {
+      ws = new WebSocket(`ws://${apiEndpoint}`);
+    } catch (err) {
+      console.error("Can't connect:", err);
+    }
+    
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data);
+      if (data.type === "role_assignment") {
+        // Redirect to the appropriate page based on role
+		    if (window.location.pathname === "/" || window.location.pathname === "/index.html") {
+            window.location.href = data.redirectUrl;
+        }
+      }
+      if (data.type === "full_server" || data.type === "session_end") {
+        window.location.href = data.redirectUrl;
+      }
+    };
+    
+    ws.onerror = error => {
+      console.error("WebSocket error:", error);
+    };
+  </script>
 </head>
 <body>
-    <div id="board"></div>
-    <script src="config.js"></script>
-    <script src="script.js"></script>
+  <h1>Connecting...</h1>
 </body>
+</html>

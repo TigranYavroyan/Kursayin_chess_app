@@ -17,14 +17,30 @@ app.ws("/", (ws) => {
 	++userCount;
 
 	validateUserCount(userCount, ws)
+	if (userCount === 1) {
+		ws.send(JSON.stringify({
+			type: "role_assignment",
+			redirectUrl: "/white.html",
+		}));
+	}
+	else if (userCount === 2) {
+		ws.send(JSON.stringify({
+			type: "role_assignment",
+			redirectUrl: "/black.html",
+		}));
+	} 
+
 
 	console.log("Someone connected...");
 	ws.on('close', () => {
 		--userCount;
-		userDisconnect({ session_starts, wss, userCount });
+		if (userCount < 2)
+			userDisconnect({ session_starts, wss, userCount });
+		console.log("Someone disconnected...");
 	});
 	ws.on("message", (data) => {
 		const message = JSON.parse(data);
+		console.log("Data from front:", message);
 		if (message.type === "meta")
 			session_starts = message.session_starts;
 		else
