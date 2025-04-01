@@ -159,5 +159,56 @@ document.addEventListener('DOMContentLoaded', () => {
                 selectedPiece = null;
             }
         });
+
+        // Touch events for mobile
+        piece.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevent scrolling and default touch behaviors
+            selectedPiece = e.target;
+            let touch = e.touches[0];
+            let rect = selectedPiece.getBoundingClientRect();
+            // Calculate offset similar to mouse events
+            offsetX = touch.clientX - rect.left;
+            offsetY = touch.clientY - rect.top;
+            startSquare = Array.from(board.children).indexOf(selectedPiece.parentElement);
+            selectedPiece.style.position = 'absolute';
+            selectedPiece.style.zIndex = 1000;
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            if (selectedPiece) {
+                e.preventDefault();
+                let touch = e.touches[0];
+                selectedPiece.style.left = `${touch.pageX - offsetX}px`;
+                selectedPiece.style.top = `${touch.pageY - offsetY}px`;
+            }
+        });
+
+        document.addEventListener('touchend', (e) => {
+            if (selectedPiece) {
+                const boardRect = board.getBoundingClientRect();
+                // Use changedTouches since touchend doesn't include current touches
+                let touch = e.changedTouches[0];
+                const x = touch.pageX - boardRect.left;
+                const y = touch.pageY - boardRect.top;
+                const valid_coords = x > 0 && x < boardRect.width && y > 0 && y < boardRect.height;
+                const col = Math.floor(x / (boardRect.width / 8)); // assuming board width is 480px
+                const row = Math.floor(y / (boardRect.height / 8)); // assuming board height is 480px
+                const endSquare = row * 8 + col;
+                if (endSquare >= 0 && endSquare < 64 && valid_coords) {
+                    ws.send(JSON.stringify({
+                        type: "move",
+                        startRow: selectedPiece.dataset.row,
+                        startCol: selectedPiece.dataset.col,
+                        endRow: String(row),
+                        endCol: String(col),
+                        startSquare: startSquare,
+                        endSquare: endSquare,
+                    }));
+                }
+                selectedPiece.style.position = 'static';
+                selectedPiece = null;
+            }
+        });
+
     });
 });
