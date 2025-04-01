@@ -5,7 +5,6 @@ import { messaging, userDisconnect } from "./utils/wsHelpers.js";
 
 const engine_name = './Checkmate_CPP/chess_engine';
 const chessEngine = spawn(engine_name);
-let userCount = 0;
 let session_starts = false;
 
 chessEngine.on('close', (code) => {
@@ -14,28 +13,36 @@ chessEngine.on('close', (code) => {
 });
 
 app.ws("/", (ws) => {
-	++userCount;
-
-	validateUserCount(userCount, ws)
-	if (userCount === 1) {
+	validateUserCount(wss.clients.size, ws)
+	console.log("Someone connected...");
+	if (wss.clients.size === 1) {
 		ws.send(JSON.stringify({
 			type: "role_assignment",
 			redirectUrl: "/white.html",
 		}));
+
+		ws.send(JSON.stringify({
+			type: "wait_player",
+			message: "Please, wait second player to connect"
+		}));
 	}
-	else if (userCount === 2) {
+	else if (wss.clients.size === 2) {
 		ws.send(JSON.stringify({
 			type: "role_assignment",
 			redirectUrl: "/black.html",
 		}));
+
+		wss.clients.forEach((client) => {
+			client.send(JSON.stringify({
+				type: "start_game",
+				message: "The second player connected, you can start"
+			}));
+		});
 	} 
 
-
-	console.log("Someone connected...");
 	ws.on('close', () => {
-		--userCount;
-		if (userCount < 2)
-			userDisconnect({ session_starts, wss, userCount });
+		if (wss.clients.size < 2)
+			userDisconnect({ session_starts, wss });
 		console.log("Someone disconnected...");
 	});
 	ws.on("message", (data) => {

@@ -57,7 +57,7 @@ ws.onmessage = event => {
             make_move(startSquare, endSquare);
         }
 	}
-    if (data["type"] === "game_over") {
+    else if (data["type"] === "game_over") {
         document.body.innerHTML = `
             <div style="text-align:center; margin-top:20%;">
                 <h1>Game Over</h1>
@@ -65,6 +65,12 @@ ws.onmessage = event => {
             </div>`;
         document.body.style.backgroundColor = "#000";
         document.body.style.color = "#fff";
+    }
+    else if (data["type"] === "wait_player") {
+        alert(data.message);
+    }
+    else if (data["type"] === "start_game") {
+        console.log(data.message);
     }
 }
 

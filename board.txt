@@ -1,13 +1,11 @@
 ---------------------------------------------------
- r  .  b  q  k  b  .  r 
- p  p  .  n  p  Q  .  p 
- .  n  .  .  .  .  p  . 
- .  .  p  .  .  .  .  . 
+ r  n  b  q  k  b  n  r 
+ p  p  p  p  p  p  p  p 
  .  .  .  .  .  .  .  . 
- .  B  .  .  .  .  .  . 
- P  P  P  P  .  P  P  P 
- R  N  B  .  K  .  N  R 
+ .  .  .  .  .  .  .  . 
+ .  .  .  .  .  .  .  . 
+ .  .  .  .  .  .  .  . 
+ P  P  P  P  P  P  P  P 
+ R  N  B  Q  K  B  N  R 
 ---------------------------------------------------
-Black's turn
-The king is under check
-Mated
+White's turn
