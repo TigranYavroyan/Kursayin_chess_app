@@ -32,7 +32,7 @@ ws.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === "full_server" || data.type === "session_end") {
         console.error("Error from server:", data.message);
-        window.location.href = data.redirectUrl; // Redirect to the error page
+        window.location.href = data.redirectUrl;
         return;
     }
 	else if (data["type"] === "update_board") {
@@ -69,7 +69,7 @@ ws.onmessage = event => {
 }
 
 function draw_checkboard () {
-    // Create the board
+   
     for (let i = 0; i < 64; i++) {
         const square = document.createElement('div');
         square.classList.add('square');
@@ -81,7 +81,7 @@ function draw_checkboard () {
         board.appendChild(square);
     }
 
-    // Add pieces using Unicode characters
+   
     const initialPositions = {
         0: '♜', 1: '♞', 2: '♝', 3: '♛', 4: '♚', 5: '♝', 6: '♞', 7: '♜',
         8: '♟', 9: '♟', 10: '♟', 11: '♟', 12: '♟', 13: '♟', 14: '♟', 15: '♟',
@@ -101,8 +101,8 @@ function draw_checkboard () {
         pieceElement.textContent = piece;
         const row = Math.floor(index / 8);
         const col = index % 8;
-        pieceElement.dataset.row = row; // Save initial row
-        pieceElement.dataset.col = col; // Save initial column
+        pieceElement.dataset.row = row;
+        pieceElement.dataset.col = col;
         board.children[index].appendChild(pieceElement);
     }
 }
@@ -111,7 +111,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	draw_checkboard();
 
-    // Make pieces draggable and snap to squares with bounds check
+   
     let selectedPiece = null;
     let offsetX, offsetY;
     let startSquare = null;
@@ -160,13 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Touch events for mobile
+       
         piece.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Prevent scrolling and default touch behaviors
+            e.preventDefault();
             selectedPiece = e.target;
             let touch = e.touches[0];
             let rect = selectedPiece.getBoundingClientRect();
-            // Calculate offset similar to mouse events
+           
             offsetX = touch.clientX - rect.left;
             offsetY = touch.clientY - rect.top;
             startSquare = Array.from(board.children).indexOf(selectedPiece.parentElement);
@@ -186,13 +186,13 @@ document.addEventListener('DOMContentLoaded', () => {
         document.addEventListener('touchend', (e) => {
             if (selectedPiece) {
                 const boardRect = board.getBoundingClientRect();
-                // Use changedTouches since touchend doesn't include current touches
+               
                 let touch = e.changedTouches[0];
                 const x = touch.pageX - boardRect.left;
                 const y = touch.pageY - boardRect.top;
                 const valid_coords = x > 0 && x < boardRect.width && y > 0 && y < boardRect.height;
-                const col = Math.floor(x / (boardRect.width / 8)); // assuming board width is 480px
-                const row = Math.floor(y / (boardRect.height / 8)); // assuming board height is 480px
+                const col = Math.floor(x / (boardRect.width / 8));
+                const row = Math.floor(y / (boardRect.height / 8));
                 const endSquare = row * 8 + col;
                 if (endSquare >= 0 && endSquare < 64 && valid_coords) {
                     ws.send(JSON.stringify({

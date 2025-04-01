@@ -32,7 +32,7 @@ ws.onmessage = event => {
     const data = JSON.parse(event.data);
     if (data.type === "full_server" || data.type === "session_end") {
         console.error("Error from server:", data.message);
-        window.location.href = data.redirectUrl; // Redirect to the error page
+        window.location.href = data.redirectUrl;
         return;
     }
 	else if (data["type"] === "update_board") {
@@ -69,7 +69,7 @@ ws.onmessage = event => {
 }
 
 function draw_checkboard () {
-    // Create the board
+   
     for (let i = 0; i < 64; i++) {
         const square = document.createElement('div');
         square.classList.add('square');
@@ -81,7 +81,7 @@ function draw_checkboard () {
         board.appendChild(square);
     }
 
-    // Add pieces using Unicode characters
+   
     const initialPositions = {
         0: '♜', 1: '♞', 2: '♝', 3: '♛', 4: '♚', 5: '♝', 6: '♞', 7: '♜',
         8: '♟', 9: '♟', 10: '♟', 11: '♟', 12: '♟', 13: '♟', 14: '♟', 15: '♟',
@@ -101,8 +101,8 @@ function draw_checkboard () {
         pieceElement.textContent = piece;
         const row = Math.floor(index / 8);
         const col = index % 8;
-        pieceElement.dataset.row = row; // Save initial row
-        pieceElement.dataset.col = col; // Save initial column
+        pieceElement.dataset.row = row;
+        pieceElement.dataset.col = col;
         board.children[index].appendChild(pieceElement);
     }
 }
@@ -115,32 +115,32 @@ document.addEventListener('DOMContentLoaded', () => {
     let startSquare = null;
     let offsetX, offsetY;
 
-    // Helper function to get Black coordinate values
+   
     function getBlackCoords(clientX, clientY) {
       const boardRect = board.getBoundingClientRect();
-      // White coordinates
+     
       const xWhite = clientX - boardRect.left;
       const yWhite = clientY - boardRect.top;
-      // Convert to Black coordinates
+     
       const xBlack = boardRect.width - xWhite;
       const yBlack = boardRect.height - yWhite;
       return { xBlack, yBlack, boardRect };
     }
 
-    // Only allow dragging for black pieces.
+   
     document.querySelectorAll('.piece').forEach(piece => {
       if (!piece.classList.contains('black')) return;
 
-      // Mouse events
+     
       piece.addEventListener('mousedown', (e) => {
         selectedPiece = e.target;
         const { xBlack, yBlack, boardRect } = getBlackCoords(e.clientX, e.clientY);
         const pieceRect = selectedPiece.getBoundingClientRect();
 
-        // Get piece's current position in white coordinates:
+       
         const pieceLeftWhite = pieceRect.left - boardRect.left;
         const pieceTopWhite = pieceRect.top - boardRect.top;
-        // Convert to Black coordinates:
+       
         const pieceLeftBlack = boardRect.width - pieceLeftWhite - pieceRect.width;
         const pieceTopBlack = boardRect.height - pieceTopWhite - pieceRect.height;
 
@@ -157,9 +157,9 @@ document.addEventListener('DOMContentLoaded', () => {
         selectedPiece.style.top = `${pieceTopBlack}px`;
       });
 
-      // Touch start event
+     
       piece.addEventListener('touchstart', (e) => {
-        e.preventDefault(); // Prevent default scrolling
+        e.preventDefault();
         selectedPiece = e.target;
         const touch = e.touches[0];
         const { xBlack, yBlack, boardRect } = getBlackCoords(touch.clientX, touch.clientY);
@@ -184,7 +184,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
 
-    // Global mouse move event
+   
     document.addEventListener('mousemove', (e) => {
       if (selectedPiece) {
         const { xBlack, yBlack } = getBlackCoords(e.clientX, e.clientY);
@@ -193,7 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Global touch move event
+   
     document.addEventListener('touchmove', (e) => {
       if (selectedPiece) {
         e.preventDefault();
@@ -204,11 +204,11 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Global mouse up event
+   
     document.addEventListener('mouseup', (e) => {
       if (selectedPiece) {
         const { xBlack, yBlack, boardRect } = getBlackCoords(e.clientX, e.clientY);
-        const colBlack = Math.floor(xBlack / 60); // assuming each square is 60px
+        const colBlack = Math.floor(xBlack / 60);
         const rowBlack = Math.floor(yBlack / 60);
         const endSquare_black = rowBlack * 8 + colBlack;
 
@@ -229,10 +229,10 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Global touch end event
+   
     document.addEventListener('touchend', (e) => {
       if (selectedPiece) {
-        // Use changedTouches as no touches remain active
+       
         const touch = e.changedTouches[0];
         const { xBlack, yBlack, boardRect } = getBlackCoords(touch.clientX, touch.clientY);
         const colBlack = Math.floor(xBlack / 60);
