@@ -1,7 +1,7 @@
 import { app, wss } from "./app.js";
 import { spawn } from "child_process";
 import { validateUserCount } from "./utils/validateUserCount.js";
-import { messaging, userDisconnect } from "./utils/wsHelpers.js";
+import { messaging, userConnection, userDisconnect } from "./utils/wsHelpers.js";
 
 const engine_name = './Checkmate_CPP/chess_engine';
 const chessEngine = spawn(engine_name);
@@ -15,30 +15,7 @@ chessEngine.on('close', (code) => {
 app.ws("/", (ws) => {
 	validateUserCount(wss.clients.size, ws)
 	console.log("Someone connected...");
-	if (wss.clients.size === 1) {
-		ws.send(JSON.stringify({
-			type: "role_assignment",
-			redirectUrl: "/white.html",
-		}));
-
-		ws.send(JSON.stringify({
-			type: "wait_player",
-			message: "Please, wait second player to connect"
-		}));
-	}
-	else if (wss.clients.size === 2) {
-		ws.send(JSON.stringify({
-			type: "role_assignment",
-			redirectUrl: "/black.html",
-		}));
-
-		wss.clients.forEach((client) => {
-			client.send(JSON.stringify({
-				type: "start_game",
-				message: "The second player connected, you can start"
-			}));
-		});
-	} 
+	userConnection({wss, ws});
 
 	ws.on('close', () => {
 		if (wss.clients.size < 2)

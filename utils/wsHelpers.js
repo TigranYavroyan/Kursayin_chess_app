@@ -42,3 +42,30 @@ export function messaging (message, chessEngine) {
 		console.error("There is error: ", err);
 	}
 }
+
+export function userConnection ({wss, ws}) {
+	if (wss.clients.size === 1) {
+		ws.send(JSON.stringify({
+			type: "role_assignment",
+			redirectUrl: "/white.html",
+		}));
+
+		ws.send(JSON.stringify({
+			type: "wait_player",
+			message: "Please, wait second player to connect"
+		}));
+	}
+	else if (wss.clients.size === 2) {
+		ws.send(JSON.stringify({
+			type: "role_assignment",
+			redirectUrl: "/black.html",
+		}));
+
+		wss.clients.forEach((client) => {
+			client.send(JSON.stringify({
+				type: "start_game",
+				message: "The second player connected, you can start"
+			}));
+		});
+	}
+}
