@@ -70,7 +70,8 @@ ws.onmessage = event => {
         alert(data.message);
     }
     else if (data["type"] === "start_game") {
-        console.log(data.message);
+        alert(data.message);
+        allow_moves();
     }
 }
 
@@ -87,7 +88,6 @@ function draw_checkboard () {
         board.appendChild(square);
     }
 
-   
     const initialPositions = {
         0: '♜', 1: '♞', 2: '♝', 3: '♛', 4: '♚', 5: '♝', 6: '♞', 7: '♜',
         8: '♟', 9: '♟', 10: '♟', 11: '♟', 12: '♟', 13: '♟', 14: '♟', 15: '♟',
@@ -117,6 +117,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	draw_checkboard();
 
+})
+
+const allow_moves = () => {
    
     let selectedPiece = null;
     let offsetX, offsetY;
@@ -217,4 +220,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
     });
-});
+};
