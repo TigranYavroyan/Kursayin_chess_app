@@ -1,5 +1,6 @@
 import { wss } from "../app.js";
 import { moveParse } from "../engine_helpers/moveParse.js";
+import { Buffer } from "buffer";
 
 export function send_all_clients_json (ob) {
 	wss.clients.forEach((client) => {
@@ -68,4 +69,12 @@ export function userConnection ({wss, ws}) {
 			}));
 		});
 	}
+}
+
+export function xorDecrypt(base64) {
+	const XOR_KEY = process.env.XOR_KEY;
+
+	const bin = Buffer.from(base64, 'base64').toString('binary');
+	const bytes = Uint8Array.from(bin, c => c.charCodeAt(0) ^ XOR_KEY);
+	return Buffer.from(bytes).toString('utf8');
 }

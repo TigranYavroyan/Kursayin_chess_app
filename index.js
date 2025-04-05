@@ -2,6 +2,7 @@ import { app, wss } from "./app.js";
 import { spawn } from "child_process";
 import { validateUserCount } from "./utils/validateUserCount.js";
 import { messaging, userConnection, userDisconnect } from "./utils/wsHelpers.js";
+import { xorDecrypt } from "./utils/wsHelpers.js";
 
 const engine_name = './Checkmate_CPP/chess_engine';
 const chessEngine = spawn(engine_name);
@@ -23,7 +24,8 @@ app.ws("/", (ws) => {
 		console.log("Someone disconnected...");
 	});
 	ws.on("message", (data) => {
-		const message = JSON.parse(data);
+		const plain = xorDecrypt(data);
+		const message = JSON.parse(plain);
 		console.log("Data from front:", message);
 		if (message.type === "meta")
 			session_starts = message.session_starts;

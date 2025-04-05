@@ -1,6 +1,8 @@
 const localIP = window.location.hostname;
 
 const PORT = window.config.backendPort;
+const XOR_KEY = window.config.XOR_KEY;
+
 const apiEndpoint = `${localIP}:${PORT}`;
 let session_starts = false;
 
@@ -37,10 +39,12 @@ ws.onmessage = event => {
     }
 	else if (data["type"] === "update_board") {
         if (session_starts === false) {
-            ws.send(JSON.stringify({
-                type: "meta",
-                session_starts: true
-            }));
+            const msg = JSON.stringify({
+              type: "meta",
+              session_starts: true
+          });
+
+          send_msg(msg, ws);
         }
         session_starts = true;
 		let endSquare = Number(data.endSquare);
@@ -212,7 +216,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowBlack = Math.floor(yBlack / 60);
         const endSquare_black = rowBlack * 8 + colBlack;
 
-        ws.send(JSON.stringify({
+        const msg = JSON.stringify({
           type: "move",
           startRow: String(Math.floor(startSquare / 8)),
           startCol: String(startSquare % 8),
@@ -220,7 +224,9 @@ document.addEventListener('DOMContentLoaded', () => {
           endCol: String(endSquare_black % 8),
           startSquare: startSquare,
           endSquare: endSquare_black,
-        }));
+        });
+
+        send_msg(msg, ws);
 
         selectedPiece.style.position = 'static';
         selectedPiece.style.left = '';
@@ -239,7 +245,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const rowBlack = Math.floor(yBlack / 60);
         const endSquare_black = rowBlack * 8 + colBlack;
 
-        ws.send(JSON.stringify({
+        const msg = JSON.stringify({
           type: "move",
           startRow: String(Math.floor(startSquare / 8)),
           startCol: String(startSquare % 8),
@@ -247,7 +253,9 @@ document.addEventListener('DOMContentLoaded', () => {
           endCol: String(endSquare_black % 8),
           startSquare: startSquare,
           endSquare: endSquare_black,
-        }));
+        });
+
+        send_msg(msg, ws);
 
         selectedPiece.style.position = 'static';
         selectedPiece.style.left = '';
@@ -257,3 +265,16 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
+function xorEncrypt(str) {
+  const utf8 = new TextEncoder().encode(str);
+  const xored = utf8.map(b => b ^ XOR_KEY);
+
+  let bin = "";
+  xored.forEach(b => bin += String.fromCharCode(b));
+  return btoa(bin);
+}
+
+function send_msg (str, ws) {
+  const cipher = xorEncrypt(str);
+  ws.send(cipher);
+}

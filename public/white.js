@@ -1,6 +1,8 @@
 const localIP = window.location.hostname;
 
 const PORT = window.config.backendPort;
+const XOR_KEY = window.config.XOR_KEY;
+
 const apiEndpoint = `${localIP}:${PORT}`;
 let session_starts = false;
 
@@ -37,10 +39,12 @@ ws.onmessage = event => {
     }
 	else if (data["type"] === "update_board") {
         if (session_starts === false) {
-            ws.send(JSON.stringify({
+            const msg = JSON.stringify({
                 type: "meta",
                 session_starts: true
-            }));
+            });
+
+            send_msg(msg, ws);
         }
         session_starts = true;
 		let endSquare = Number(data.endSquare);
@@ -154,7 +158,7 @@ const allow_moves = () => {
                 const row = Math.floor(y / 60);
                 const endSquare = row * 8 + col;
                 if (endSquare >= 0 && endSquare < 64 && valid_coords) {
-                    ws.send(JSON.stringify({
+                    const msg = JSON.stringify({
                         "type" : "move",
                         "startRow" : selectedPiece.dataset.row,
                         "startCol" : selectedPiece.dataset.col,
@@ -162,7 +166,9 @@ const allow_moves = () => {
                         "endCol" : String(col),
                         "startSquare" : startSquare,
                         "endSquare" : endSquare,
-                    }));
+                    });
+
+                    send_msg(msg, ws);
                 }
                 selectedPiece.style.position = 'static';
                 selectedPiece = null;
@@ -204,7 +210,7 @@ const allow_moves = () => {
                 const row = Math.floor(y / (boardRect.height / 8));
                 const endSquare = row * 8 + col;
                 if (endSquare >= 0 && endSquare < 64 && valid_coords) {
-                    ws.send(JSON.stringify({
+                    const msg = JSON.stringify({
                         type: "move",
                         startRow: selectedPiece.dataset.row,
                         startCol: selectedPiece.dataset.col,
@@ -212,7 +218,9 @@ const allow_moves = () => {
                         endCol: String(col),
                         startSquare: startSquare,
                         endSquare: endSquare,
-                    }));
+                    });
+
+                    send_msg(msg, ws);
                 }
                 selectedPiece.style.position = 'static';
                 selectedPiece = null;
@@ -221,3 +229,18 @@ const allow_moves = () => {
 
     });
 };
+
+
+function xorEncrypt(str) {
+    const utf8 = new TextEncoder().encode(str);
+    const xored = utf8.map(b => b ^ XOR_KEY);
+  
+    let bin = "";
+    xored.forEach(b => bin += String.fromCharCode(b));
+    return btoa(bin);
+}
+
+function send_msg (str, ws) {
+    const cipher = xorEncrypt(str);
+    ws.send(cipher);
+}
